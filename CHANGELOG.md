@@ -13,6 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Microphone input: answer by playing a real instrument (digital piano, guitar, strings…);
+  the app shows what it hears and stays silent while listening.
 - Installable app (PWA) that works offline after the first visit.
 - Automatic deployment to GitHub Pages.
 

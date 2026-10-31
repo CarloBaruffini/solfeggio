@@ -9,6 +9,8 @@ export interface Settings {
   readonly naming: NamingSystem;
   readonly showKeyNames: boolean;
   readonly sound: boolean;
+  /** Answer by playing an instrument into the microphone (see docs/features/microphone-input.md). */
+  readonly microphone: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -18,6 +20,7 @@ export const DEFAULT_SETTINGS: Settings = {
   naming: 'solfege',
   showKeyNames: true,
   sound: true,
+  microphone: false,
 };
 
 const isOneOf = <T>(options: readonly T[], value: unknown): value is T =>
@@ -37,5 +40,6 @@ export function sanitizeSettings(stored: unknown): Partial<Settings> {
   if (typeof data.accidentals === 'boolean') result.accidentals = data.accidentals;
   if (typeof data.showKeyNames === 'boolean') result.showKeyNames = data.showKeyNames;
   if (typeof data.sound === 'boolean') result.sound = data.sound;
+  if (typeof data.microphone === 'boolean') result.microphone = data.microphone;
   return result;
 }

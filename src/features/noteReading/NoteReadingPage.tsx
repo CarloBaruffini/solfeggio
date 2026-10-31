@@ -4,6 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { Piano } from '@/components/Piano';
 import type { NoteReadingOptions } from '@/core/exercises/noteReading';
 import { midiInOctave } from '@/core/music';
+import { MicrophonePanel, useMicrophoneInput } from '@/features/microphone';
 import type { Settings } from '@/features/settings';
 import { useSettingsStore } from '@/features/settings';
 import { t } from '@/i18n';
@@ -46,8 +47,14 @@ export function NoteReadingPage() {
     [clef, ledgerLines, accidentals],
   );
 
-  const session = useNoteReadingSession({ options, sound: settings.sound, getNoteCount });
+  // The app stays silent while the microphone listens, or it would hear itself.
+  const session = useNoteReadingSession({
+    options,
+    sound: settings.sound && !settings.microphone,
+    getNoteCount,
+  });
   const { play, startRound } = session;
+  const microphone = useMicrophoneInput({ enabled: settings.microphone, onNote: play });
 
   useEffect(() => {
     const keyboard = createComputerKeyboardSource();
@@ -59,6 +66,9 @@ export function NoteReadingPage() {
 
   const changeSettings = (patch: Partial<Settings>) => {
     updateSettings(patch);
+    // Still inside the user's tap: browsers only start audio from a gesture.
+    if (patch.microphone === true) microphone.start();
+    if (patch.microphone === false) microphone.stop();
     const next: NoteReadingOptions = { ...options, ...pickRoundOptions(patch) };
     if (
       next.clef !== clef ||
@@ -95,6 +105,8 @@ export function NoteReadingPage() {
       <p className={styles.feedback} data-tone={feedback.tone} aria-live="polite">
         {feedback.text}
       </p>
+
+      <MicrophonePanel microphone={microphone} naming={settings.naming} />
 
       <Piano
         label={t.piano.label}
