@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { Piano } from '@/components/Piano';
@@ -8,7 +8,6 @@ import type { Settings } from '@/features/settings';
 import { useSettingsStore } from '@/features/settings';
 import { t } from '@/i18n';
 import { COMPUTER_KEY_LAYOUT, computerKeyLabel, createComputerKeyboardSource } from '@/input';
-import { StaffView } from '@/notation';
 
 import { feedbackFor } from './feedback';
 import styles from './NoteReadingPage.module.css';
@@ -17,6 +16,12 @@ import { notesPerRound } from './noteCount';
 import { useRecordsStore } from './recordsStore';
 import { SessionStats } from './SessionStats';
 import { useNoteReadingSession } from './useNoteReadingSession';
+
+// VexFlow and its embedded music font are large: load them in their own chunk while the
+// rest of the page renders.
+const StaffView = lazy(() =>
+  import('@/notation').then((module) => ({ default: module.StaffView })),
+);
 
 /** Octave of the notes played with the on-screen piano (it has a single octave). */
 const SCREEN_PIANO_OCTAVE = 4;
