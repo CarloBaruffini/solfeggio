@@ -1,0 +1,50 @@
+.card {
+  position: relative;
+  container-type: inline-size;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding-block: 6px;
+  overflow: hidden;
+}
+
+.target {
+  position: relative;
+  z-index: 1;
+  /* Reserve the rendered height (see staffHeight) to avoid a layout shift. */
+  min-height: 221px;
+}
+
+@container (width < 480px) {
+  .target {
+    min-height: 174px;
+  }
+}
+
+.target :global(svg) {
+  display: block;
+}
+
+.cursor {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  width: 40px;
+  margin-left: -20px;
+  border-radius: 10px;
+  background: var(--staff-cursor);
+  border: 1px solid var(--staff-cursor-edge);
+  transition: left 0.22s ease;
+  pointer-events: none;
+}
+
+.cursor[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    transition: none;
+  }
+}

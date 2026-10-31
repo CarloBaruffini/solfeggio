@@ -1,0 +1,5 @@
+# eslint-plugin-jsx-a11y has not declared ESLint 10 support yet, but works with it.
+# Remove this rule once the plugin's peer range includes ^10.
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-jsx-a11y>eslint: '10'
