@@ -7,6 +7,7 @@ import {
   isBlackKey,
   midiInOctave,
   midiNumber,
+  midiOfFrequency,
   parsePitch,
   pitchClass,
   pitchClassOfMidi,
@@ -98,5 +99,20 @@ describe('frequencyOfMidi', () => {
     expect(frequencyOfMidi(69)).toBe(440);
     expect(frequencyOfMidi(81)).toBe(880);
     expect(frequencyOfMidi(60)).toBeCloseTo(261.63, 2);
+  });
+});
+
+describe('midiOfFrequency', () => {
+  it('inverts frequencyOfMidi', () => {
+    expect(midiOfFrequency(440)).toBe(69);
+    for (const midi of [21, 34, 60, 87, 108]) {
+      expect(midiOfFrequency(frequencyOfMidi(midi))).toBeCloseTo(midi, 9);
+    }
+  });
+
+  it('rounds slightly out-of-tune notes to the nearest semitone', () => {
+    expect(Math.round(midiOfFrequency(445))).toBe(69);
+    expect(Math.round(midiOfFrequency(452))).toBe(69);
+    expect(Math.round(midiOfFrequency(455))).toBe(70);
   });
 });
