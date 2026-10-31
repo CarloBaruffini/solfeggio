@@ -24,7 +24,13 @@ export type SessionEvent =
       /** Whether the correct key should now be revealed. */
       readonly hint: boolean;
     }
-  | { readonly kind: 'roundComplete'; readonly firstAttempt: number; readonly total: number };
+  | {
+      readonly kind: 'roundComplete';
+      /** The last note of the round, just answered correctly. */
+      readonly pitch: Pitch;
+      readonly firstAttempt: number;
+      readonly total: number;
+    };
 
 export interface SessionState {
   readonly notes: readonly RoundNote[];
@@ -98,6 +104,7 @@ function answer(state: SessionState, midi: number, at: number): SessionState {
     lastEvent: complete
       ? {
           kind: 'roundComplete',
+          pitch: target.pitch,
           firstAttempt: state.notes.filter((note) => note.wrongAttempts === 0).length,
           total: state.notes.length,
         }
@@ -123,7 +130,9 @@ export function hintPitchClass(state: SessionState): PitchClass | null {
 }
 
 /** How each note of the round should be drawn. */
-export function noteDisplayStates(state: SessionState): NoteDisplayState[] {
+export function noteDisplayStates(
+  state: Pick<SessionState, 'notes' | 'currentIndex'>,
+): NoteDisplayState[] {
   return state.notes.map((note, index) => {
     if (index === state.currentIndex) return 'current';
     if (index > state.currentIndex) return 'pending';

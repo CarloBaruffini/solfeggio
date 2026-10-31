@@ -1,0 +1,36 @@
+.card {
+  display: flex;
+  flex-direction: column-reverse;
+  min-width: 104px;
+  padding: 10px 14px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 520px) {
+  .card {
+    flex: 1 1 28%;
+    min-width: 0;
+    padding: 8px 6px;
+  }
+
+  .value {
+    font-size: 20px;
+  }
+}

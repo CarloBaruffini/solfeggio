@@ -76,7 +76,12 @@ describe('sessionReducer', () => {
   it('completes the round and ignores further answers', () => {
     const done = run(createSession(pitches, 0), answer(A4), answer(G4), answer(CS5), answer(BB3));
     expect(isRoundComplete(done)).toBe(true);
-    expect(done.lastEvent).toEqual({ kind: 'roundComplete', firstAttempt: 2, total: 3 });
+    expect(done.lastEvent).toEqual({
+      kind: 'roundComplete',
+      pitch: pitches[2],
+      firstAttempt: 2,
+      total: 3,
+    });
     expect(noteDisplayStates(done)).toEqual(['missed', 'correct', 'correct']);
     expect(run(done, answer(A4))).toBe(done);
   });

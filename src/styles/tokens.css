@@ -1,0 +1,93 @@
+/*
+ * Design tokens. Every colour has a light and a dark value; components must use these
+ * variables instead of literal colours. The dark values are repeated for the
+ * `data-theme="dark"` override so a future theme switch can force either theme.
+ */
+:root {
+  --bg: #f3efe6;
+  --surface: #fbf9f4;
+  --ink: #1f1c18;
+  --muted: #6f685c;
+  --line: #e0d9ca;
+  --accent: #2d5b8c;
+  --ok: #2e7d4f;
+  --err: #c2412d;
+  --paper: #fffdf7;
+  --paper-line: #e6dfcf;
+  --staff-cursor: rgb(45 91 140 / 0.1);
+  --staff-cursor-edge: rgb(45 91 140 / 0.18);
+  --white-key: #fdfcf8;
+  --white-key-edge: #d8d1c2;
+  --white-key-ink: #4a453d;
+  --white-key-ok: #cfe9d8;
+  --white-key-err: #f6d2c9;
+  --white-key-hint: #c9dcf0;
+  --black-key-top: #34302b;
+  --black-key-bottom: #15130f;
+  --black-key-ink: #e8e2d4;
+  --black-key-ok: #2f7a4d;
+  --black-key-err: #a3412f;
+  --black-key-hint: #3d6a9a;
+  --seg-bg: #e9e3d6;
+  --seg-on: #ffffff;
+  --track-off: #d6cfc0;
+  --shadow: 0 1px 2px rgb(40 30 10 / 0.06), 0 8px 24px rgb(40 30 10 / 0.06);
+
+  --font-body: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --gutter: 16px;
+  --content-width: 880px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #151412;
+    --surface: #1e1c19;
+    --ink: #ece7dc;
+    --muted: #a29b8e;
+    --line: #34302a;
+    --accent: #7fa8d6;
+    --ok: #5cc488;
+    --err: #f07a67;
+    --paper: #f7f2e6;
+    --paper-line: #3a362f;
+    --white-key: #ebe6da;
+    --white-key-edge: #8e877a;
+    --black-key-top: #2b2824;
+    --black-key-bottom: #0b0a09;
+    --seg-bg: #2a2723;
+    --seg-on: #3b3731;
+    --track-off: #46423b;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #151412;
+  --surface: #1e1c19;
+  --ink: #ece7dc;
+  --muted: #a29b8e;
+  --line: #34302a;
+  --accent: #7fa8d6;
+  --ok: #5cc488;
+  --err: #f07a67;
+  --paper: #f7f2e6;
+  --paper-line: #3a362f;
+  --white-key: #ebe6da;
+  --white-key-edge: #8e877a;
+  --black-key-top: #2b2824;
+  --black-key-bottom: #0b0a09;
+  --seg-bg: #2a2723;
+  --seg-on: #3b3731;
+  --track-off: #46423b;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
+
+  color-scheme: dark;
+}
