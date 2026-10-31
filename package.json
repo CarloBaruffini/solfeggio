@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "Sight-reading practice web app: read notes on the staff and play them on the keyboard.",
   "type": "module",
+  "packageManager": "pnpm@12.3.4",
   "engines": {
     "node": ">=24"
   },
