@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lettura delle note</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.3/build/cjs/vexflow.js"></script>
+  <style>
+    :root {
+      --bg: #f3efe6;
+      --surface: #fbf9f4;
+      --ink: #1f1c18;
+      --muted: #6f685c;
+      --line: #e0d9ca;
+      --accent: #2d5b8c;
+      --accent-soft: rgba(45, 91, 140, 0.12);
+      --ok: #2e7d4f;
+      --err: #c2412d;
+      --paper: #fffdf7;
+      --paper-line: #e6dfcf;
+      --white-key: #fdfcf8;
+      --white-key-edge: #d8d1c2;
+      --black-key-top: #34302b;
+      --black-key-bottom: #15130f;
+      --seg-bg: #e9e3d6;
+      --seg-on: #ffffff;
+      --shadow: 0 1px 2px rgba(40, 30, 10, 0.06), 0 8px 24px rgba(40, 30, 10, 0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #151412;
+        --surface: #1e1c19;
+        --ink: #ece7dc;
+        --muted: #a29b8e;
+        --line: #34302a;
+        --accent: #7fa8d6;
+        --accent-soft: rgba(127, 168, 214, 0.16);
+        --ok: #5cc488;
+        --err: #f07a67;
+        --paper: #f7f2e6;
+        --paper-line: #3a362f;
+        --white-key: #ebe6da;
+        --white-key-edge: #8e877a;
+        --black-key-top: #2b2824;
+        --black-key-bottom: #0b0a09;
+        --seg-bg: #2a2723;
+        --seg-on: #3b3731;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #151412;
+      --surface: #1e1c19;
+      --ink: #ece7dc;
+      --muted: #a29b8e;
+      --line: #34302a;
+      --accent: #7fa8d6;
+      --accent-soft: rgba(127, 168, 214, 0.16);
+      --ok: #5cc488;
+      --err: #f07a67;
+      --paper: #f7f2e6;
+      --paper-line: #3a362f;
+      --white-key: #ebe6da;
+      --white-key-edge: #8e877a;
+      --black-key-top: #2b2824;
+      --black-key-bottom: #0b0a09;
+      --seg-bg: #2a2723;
+      --seg-on: #3b3731;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 28px 16px 40px;
+    }
+
+    header { margin-bottom: 20px; }
+    h1 {
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(26px, 4.5vw, 34px);
+      letter-spacing: -0.01em;
+      margin: 0 0 4px;
+    }
+    .sub { margin: 0; color: var(--muted); }
+
+    /* Controlli */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 22px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .seg {
+      display: inline-flex;
+      background: var(--seg-bg);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .seg button {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .seg button[aria-pressed="true"] {
+      background: var(--seg-on);
+      color: var(--ink);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+    .seg button:focus-visible, .btn:focus-visible, .toggle input:focus-visible + .track {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .toggles { display: flex; flex-wrap: wrap; gap: 8px 16px; padding-bottom: 6px; }
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle input { position: absolute; opacity: 0; pointer-events: none; }
+    .track {
+      width: 34px; height: 20px;
+      border-radius: 999px;
+      background: var(--line);
+      position: relative;
+      transition: background 0.15s;
+      flex: none;
+    }
+    .track::after {
+      content: "";
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      transition: transform 0.15s;
+    }
+    .toggle input:checked + .track { background: var(--accent); }
+    .toggle input:checked + .track::after { transform: translateX(14px); }
+
+    /* Pentagramma */
+    .staff-card {
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--paper-line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px 0;
+      overflow: hidden;
+    }
+    #staff { position: relative; z-index: 1; min-height: 160px; }
+    #staff svg { display: block; }
+    .cursor {
+      position: absolute;
+      top: 10px; bottom: 10px;
+      width: 40px;
+      margin-left: -20px;
+      border-radius: 10px;
+      background: rgba(45, 91, 140, 0.1);
+      border: 1px solid rgba(45, 91, 140, 0.18);
+      transition: left 0.22s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cursor.instant { transition: none; }
+    .cursor.hidden { opacity: 0; }
+
+    .feedback {
+      min-height: 28px;
+      margin: 14px 0 16px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .feedback.ok { color: var(--ok); }
+    .feedback.err { color: var(--err); }
+    .feedback.done { color: var(--accent); }
+
+    /* Pianoforte */
+    .piano {
+      position: relative;
+      display: flex;
+      height: 220px;
+      max-width: 620px;
+      margin: 0 auto;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    .key {
+      font: inherit;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .key.white {
+      flex: 1;
+      margin: 0 1px;
+      background: var(--white-key);
+      border: 1px solid var(--white-key-edge);
+      border-top: 0;
+      border-radius: 0 0 9px 9px;
+      color: #4a453d;
+      padding-bottom: 12px;
+      box-shadow: inset 0 -7px 0 rgba(0, 0, 0, 0.06), 0 2px 3px rgba(0, 0, 0, 0.08);
+      transition: background 0.12s, box-shadow 0.12s;
+    }
+    .key.black {
+      position: absolute;
+      top: 0;
+      width: calc(100% / 7 * 0.6);
+      height: 61%;
+      z-index: 2;
+      background: linear-gradient(var(--black-key-top), var(--black-key-bottom));
+      border-radius: 0 0 6px 6px;
+      color: #e8e2d4;
+      padding-bottom: 9px;
+      box-shadow: inset 0 -5px 0 rgba(255, 255, 255, 0.07), 0 3px 4px rgba(0, 0, 0, 0.3);
+      transition: background 0.12s;
+    }
+    .key.white:active, .key.white.down { box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.06); }
+    .key.black:active, .key.black.down { box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.07); }
+    .key.flash-ok { background: #cfe9d8; }
+    .key.black.flash-ok { background: linear-gradient(#3f8a5d, #1f5a37); }
+    .key.flash-err { background: #f6d2c9; }
+    .key.black.flash-err { background: linear-gradient(#b5523e, #7a2a1b); }
+    .key.white.hint { animation: hint-white 1.1s ease-in-out infinite; }
+    .key.black.hint { animation: hint-black 1.1s ease-in-out infinite; }
+    @keyframes hint-white {
+      0%, 100% { background: var(--white-key); }
+      50% { background: #c9dcf0; }
+    }
+    @keyframes hint-black {
+      0%, 100% { background: var(--black-key-bottom); }
+      50% { background: #3d6a9a; }
+    }
+
+    .kname { font-size: 13px; font-weight: 600; line-height: 1.15; text-align: center; }
+    .key.black .kname { font-size: 10px; font-weight: 500; }
+    .kbd {
+      margin-top: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.45;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      padding: 0 4px;
+      line-height: 14px;
+    }
+    .piano.no-names .kname { visibility: hidden; }
+    @media (hover: none), (pointer: coarse) { .kbd { display: none; } }
+
+    /* Statistiche */
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: stretch;
+      margin-top: 26px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 14px;
+      min-width: 104px;
+      text-align: center;
+    }
+    .stat .v {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 24px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
+    }
+    .stat .k { font-size: 12px; color: var(--muted); }
+    .actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+    .btn {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .hint-line { text-align: center; color: var(--muted); font-size: 13px; margin-top: 18px; }
+    @media (hover: none), (pointer: coarse) { .hint-line { display: none; } }
+
+    @media (max-width: 520px) {
+      .wrap { padding-top: 20px; }
+      .piano { height: 190px; }
+      .stat { min-width: 0; flex: 1 1 28%; padding: 8px 6px; }
+      .stat .v { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>Lettura delle note</h1>
+      <p class="sub">Leggi la nota evidenziata sul pentagramma e suonala sulla tastiera.</p>
+    </header>
+
+    <section class="controls" aria-label="Impostazioni">
+      <div class="field">
+        <span class="label" id="clef-label">Chiave</span>
+        <div class="seg" role="group" aria-labelledby="clef-label" data-setting="clef">
+          <button type="button" data-value="treble">Violino</button>
+          <button type="button" data-value="bass">Basso</button>
+          <button type="button" data-value="alto">Contralto</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label" id="ledger-label">Tagli addizionali</span>
+        <div class="seg" role="group" aria-labelledby="ledger-label" data-setting="ledger">
+          <button type="button" data-value="0">Nessuno</button>
+          <button type="button" data-value="1">1</button>
+          <button type="button" data-value="2">2</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label" id="naming-label">Nomi</span>
+        <div class="seg" role="group" aria-labelledby="naming-label" data-setting="naming">
+          <button type="button" data-value="it">Do Re Mi</button>
+          <button type="button" data-value="en">C D E</button>
+        </div>
+      </div>
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="opt-accidentals"><span class="track"></span>Alterazioni ♯ ♭</label>
+        <label class="toggle"><input type="checkbox" id="opt-names"><span class="track"></span>Nomi sui tasti</label>
+        <label class="toggle"><input type="checkbox" id="opt-sound"><span class="track"></span>Suono</label>
+      </div>
+    </section>
+
+    <section class="staff-card" aria-label="Pentagramma">
+      <div class="cursor hidden" id="cursor"></div>
+      <div id="staff"></div>
+    </section>
+
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+
+    <section class="piano" id="piano" aria-label="Tastiera"></section>
+
+    <section class="stats" aria-label="Statistiche">
+      <div class="stat"><div class="v" id="s-correct">0</div><div class="k">Corrette</div></div>
+      <div class="stat"><div class="v" id="s-wrong">0</div><div class="k">Errori</div></div>
+      <div class="stat"><div class="v" id="s-acc">—</div><div class="k">Precisione</div></div>
+      <div class="stat"><div class="v" id="s-streak">0</div><div class="k">Serie</div></div>
+      <div class="stat"><div class="v" id="s-best">0</div><div class="k">Record serie</div></div>
+      <div class="stat"><div class="v" id="s-time">—</div><div class="k">Tempo medio</div></div>
+    </section>
+    <div class="actions">
+      <button type="button" class="btn" id="btn-new">Nuove note</button>
+      <button type="button" class="btn" id="btn-reset">Azzera statistiche</button>
+    </div>
+    <p class="hint-line">Puoi suonare anche dalla tastiera del computer: A W S E D F T G Y H U J</p>
+  </main>
+
+  <script>
+    const VF = Vex.Flow;
+
+    const LETTERS = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+    const LETTER_PC = [0, 2, 4, 5, 7, 9, 11];
+    const NAMES = {
+      it: ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si'],
+      en: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+    };
+    // Indice diatonico (ottava * 7 + lettera) della prima riga del pentagramma per ogni chiave.
+    const BOTTOM_LINE = { treble: 4 * 7 + 2, bass: 2 * 7 + 4, alto: 3 * 7 + 3 };
+
+    // 12 tasti: pitch class -> lettera naturale e alterazione per l'etichetta.
+    const KEYS = [
+      { pc: 0, white: true, letter: 0, kbd: 'A' },
+      { pc: 1, white: false, letter: 0, kbd: 'W' },
+      { pc: 2, white: true, letter: 1, kbd: 'S' },
+      { pc: 3, white: false, letter: 1, kbd: 'E' },
+      { pc: 4, white: true, letter: 2, kbd: 'D' },
+      { pc: 5, white: true, letter: 3, kbd: 'F' },
+      { pc: 6, white: false, letter: 3, kbd: 'T' },
+      { pc: 7, white: true, letter: 4, kbd: 'G' },
+      { pc: 8, white: false, letter: 4, kbd: 'Y' },
+      { pc: 9, white: true, letter: 5, kbd: 'H' },
+      { pc: 10, white: false, letter: 5, kbd: 'U' },
+      { pc: 11, white: true, letter: 6, kbd: 'J' },
+    ];
+    const KBD_TO_PC = Object.fromEntries(KEYS.map(k => ['Key' + k.kbd, k.pc]));
+
+    // Colori delle note (il pentagramma è sempre su "carta" chiara).
+    const INK = '#1f1c18';
+    const CURRENT = '#2d5b8c';
+    const OK = '#2e7d4f';
+    const ERR = '#c2412d';
+
+    const STORAGE_KEY = 'solfeggio-settings-v1';
+
+    const settings = {
+      clef: 'treble',
+      ledger: 1,
+      naming: 'it',
+      accidentals: false,
+      showNames: true,
+      sound: true,
+      best: 0,
+    };
+    try {
+      Object.assign(settings, JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'));
+    } catch (e) { /* storage non disponibile */ }
+
+    function saveSettings() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch (e) { /* ignora */ }
+    }
+
+    const game = {
+      seq: [],
+      idx: 0,
+      noteStart: 0,
+      locked: false,
+      stats: { correct: 0, wrong: 0, streak: 0, totalTime: 0, timedNotes: 0 },
+    };
+
+    const $ = sel => document.querySelector(sel);
+    const staffCard = $('.staff-card');
+    const staffEl = $('#staff');
+    const cursorEl = $('#cursor');
+    const feedbackEl = $('#feedback');
+    const pianoEl = $('#piano');
+
+    // ---------- Note ----------
+
+    function pitchClass(n) {
+      return (LETTER_PC[n.letter] + n.acc + 12) % 12;
+    }
+
+    function noteName(n) {
+      const acc = n.acc === 1 ? '♯' : n.acc === -1 ? '♭' : '';
+      return NAMES[settings.naming][n.letter] + acc;
+    }
+
+    function keyName(k) {
+      const names = NAMES[settings.naming];
+      if (k.white) return names[k.letter];
+      return names[k.letter] + '♯<br>' + names[k.letter + 1] + '♭';
+    }
+
+    function keyNamePlain(pc) {
+      const k = KEYS[pc];
+      const names = NAMES[settings.naming];
+      return k.white ? names[k.letter] : `${names[k.letter]}♯/${names[k.letter + 1]}♭`;
+    }
+
+    function randomNote(prev) {
+      const b = BOTTOM_LINE[settings.clef];
+      const ext = settings.ledger * 2;
+      const lo = b - 1 - ext;
+      const hi = b + 9 + ext;
+      let n;
+      do {
+        const d = lo + Math.floor(Math.random() * (hi - lo + 1));
+        const letter = d % 7;
+        let acc = 0;
+        if (settings.accidentals && Math.random() < 0.4) {
+          const options = [];
+          if (letter !== 2 && letter !== 6) options.push(1);   // niente Mi♯ / Si♯
+          if (letter !== 0 && letter !== 3) options.push(-1);  // niente Do♭ / Fa♭
+          acc = options[Math.floor(Math.random() * options.length)];
+        }
+        n = { d, letter, octave: Math.floor(d / 7), acc, missed: false, wrongCount: 0 };
+      } while (prev && prev.d === n.d && prev.acc === n.acc);
+      return n;
+    }
+
+    // VexFlow imposta la larghezza del contenitore su cui disegna: misuriamo la card che lo contiene.
+    function staffWidth() {
+      return staffCard.clientWidth;
+    }
+
+    function notesPerRound() {
+      const w = staffWidth() || 800;
+      if (w >= 640) return 8;
+      if (w >= 440) return 6;
+      return 5;
+    }
+
+    function newRound() {
+      const count = notesPerRound();
+      game.seq = [];
+      for (let i = 0; i < count; i++) game.seq.push(randomNote(game.seq[i - 1]));
+      game.idx = 0;
+      game.locked = false;
+      game.noteStart = performance.now();
+      clearHint();
+      cursorEl.classList.add('instant');
+      render();
+      requestAnimationFrame(() => cursorEl.classList.remove('instant'));
+      setFeedback('Suona la nota evidenziata', '');
+    }
+
+    // ---------- Pentagramma ----------
+
+    let noteCenters = [];
+    let renderScale = 1;
+
+    function vfKey(n) {
+      const acc = n.acc === 1 ? '#' : n.acc === -1 ? 'b' : '';
+      return `${LETTERS[n.letter]}${acc}/${n.octave}`;
+    }
+
+    function colorFor(i) {
+      const n = game.seq[i];
+      if (i < game.idx) return n.missed ? ERR : OK;
+      if (i === game.idx) return CURRENT;
+      return INK;
+    }
+
+    function render() {
+      staffEl.innerHTML = '';
+      const cw = staffWidth();
+      if (!cw) return;
+      const s = cw < 480 ? 1.3 : 1.65;
+      renderScale = s;
+      const logicalW = cw / s;
+      const logicalH = 134;
+
+      const renderer = new VF.Renderer(staffEl, VF.Renderer.Backends.SVG);
+      renderer.resize(cw, Math.round(logicalH * s));
+      const ctx = renderer.getContext();
+      ctx.scale(s, s);
+
+      const stave = new VF.Stave(10, 4, logicalW - 20);
+      stave.addClef(settings.clef);
+      stave.setContext(ctx).draw();
+
+      const notes = game.seq.map((n, i) => {
+        const sn = new VF.StaveNote({ clef: settings.clef, keys: [vfKey(n)], duration: 'q', auto_stem: true });
+        const color = colorFor(i);
+        if (n.acc) {
+          const acc = new VF.Accidental(n.acc > 0 ? '#' : 'b');
+          acc.setStyle({ fillStyle: color, strokeStyle: color });
+          sn.addModifier(acc, 0);
+        }
+        sn.setStyle({ fillStyle: color, strokeStyle: color });
+        return sn;
+      });
+
+      const voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 })
+        .setMode(VF.Voice.Mode.SOFT)
+        .addTickables(notes);
+      new VF.Formatter().joinVoices([voice]).formatToStave([voice], stave);
+      voice.draw(ctx, stave);
+
+      noteCenters = notes.map(sn => sn.getAbsoluteX() + sn.getGlyphWidth() / 2);
+      placeCursor();
+    }
+
+    function placeCursor() {
+      if (game.idx >= game.seq.length || !noteCenters.length) {
+        cursorEl.classList.add('hidden');
+        return;
+      }
+      cursorEl.classList.remove('hidden');
+      cursorEl.style.left = (noteCenters[game.idx] * renderScale) + 'px';
+    }
+
+    // ---------- Tastiera ----------
+
+    function buildPiano() {
+      pianoEl.innerHTML = '';
+      let whiteIndex = 0;
+      for (const k of KEYS) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'key ' + (k.white ? 'white' : 'black');
+        btn.dataset.pc = k.pc;
+        btn.innerHTML = `<span class="kname"></span><span class="kbd">${k.kbd}</span>`;
+        if (k.white) {
+          whiteIndex++;
+        } else {
+          // Tasto nero centrato sul bordo tra i due tasti bianchi adiacenti.
+          btn.style.left = `calc(100% / 7 * ${whiteIndex} - 100% / 7 * 0.3)`;
+        }
+        btn.addEventListener('pointerdown', e => {
+          e.preventDefault();
+          press(k.pc);
+        });
+        pianoEl.appendChild(btn);
+      }
+      updateKeyLabels();
+    }
+
+    function updateKeyLabels() {
+      pianoEl.querySelectorAll('.key').forEach(btn => {
+        const k = KEYS[+btn.dataset.pc];
+        btn.querySelector('.kname').innerHTML = keyName(k);
+        btn.setAttribute('aria-label', keyNamePlain(k.pc));
+      });
+      pianoEl.classList.toggle('no-names', !settings.showNames);
+    }
+
+    function keyEl(pc) {
+      return pianoEl.querySelector(`.key[data-pc="${pc}"]`);
+    }
+
+    function flashKey(pc, cls) {
+      const el = keyEl(pc);
+      el.classList.remove('flash-ok', 'flash-err');
+      void el.offsetWidth;
+      el.classList.add(cls, 'down');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove(cls, 'down'), 260);
+    }
+
+    function clearHint() {
+      pianoEl.querySelectorAll('.key.hint').forEach(el => el.classList.remove('hint'));
+    }
+
+    // ---------- Audio ----------
+
+    let audioCtx = null;
+
+    function playMidi(midi) {
+      if (!settings.sound) return;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audioCtx = audioCtx || new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const t = audioCtx.currentTime;
+      const f = 440 * Math.pow(2, (midi - 69) / 12);
+      const out = audioCtx.createGain();
+      out.gain.setValueAtTime(0.0001, t);
+      out.gain.exponentialRampToValueAtTime(0.3, t + 0.008);
+      out.gain.exponentialRampToValueAtTime(0.08, t + 0.4);
+      out.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+
+      const lp = audioCtx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(Math.min(9000, f * 10), t);
+      lp.frequency.exponentialRampToValueAtTime(Math.max(200, f * 2), t + 1.2);
+      lp.connect(out).connect(audioCtx.destination);
+
+      for (const [mult, type, gain] of [[1, 'triangle', 1], [2, 'sine', 0.35], [3, 'sine', 0.12], [4, 'sine', 0.05]]) {
+        const osc = audioCtx.createOscillator();
+        osc.type = type;
+        osc.frequency.value = f * mult;
+        const g = audioCtx.createGain();
+        g.gain.value = gain;
+        osc.connect(g).connect(lp);
+        osc.start(t);
+        osc.stop(t + 1.9);
+      }
+    }
+
+    // ---------- Logica di gioco ----------
+
+    function setFeedback(text, cls) {
+      feedbackEl.textContent = text;
+      feedbackEl.className = 'feedback' + (cls ? ' ' + cls : '');
+    }
+
+    function press(pc) {
+      const target = game.seq[game.idx];
+      // Suona il tasto nell'ottava della nota da leggere, così la risposta giusta suona come scritta.
+      const octave = target ? target.octave : 4;
+      playMidi((octave + 1) * 12 + pc);
+      if (game.locked || !target) {
+        flashKey(pc, 'down');
+        return;
+      }
+
+      if (pc === pitchClass(target)) {
+        flashKey(pc, 'flash-ok');
+        clearHint();
+        const s = game.stats;
+        s.correct++;
+        s.totalTime += performance.now() - game.noteStart;
+        s.timedNotes++;
+        if (!target.missed) {
+          s.streak++;
+          if (s.streak > settings.best) {
+            settings.best = s.streak;
+            saveSettings();
+          }
+        }
+        setFeedback(`✓ ${noteName(target)}`, 'ok');
+        game.idx++;
+        game.noteStart = performance.now();
+        render();
+        updateStats();
+        if (game.idx >= game.seq.length) finishRound();
+      } else {
+        flashKey(pc, 'flash-err');
+        target.missed = true;
+        target.wrongCount++;
+        game.stats.wrong++;
+        game.stats.streak = 0;
+        if (target.wrongCount >= 2) {
+          keyEl(pitchClass(target)).classList.add('hint');
+          setFeedback(`✗ Hai suonato ${keyNamePlain(pc)} — la nota è ${noteName(target)}`, 'err');
+        } else {
+          setFeedback(`✗ Hai suonato ${keyNamePlain(pc)} — riprova`, 'err');
+        }
+        render();
+        updateStats();
+      }
+    }
+
+    function finishRound() {
+      game.locked = true;
+      const firstTry = game.seq.filter(n => !n.missed).length;
+      setFeedback(`Fatto! ${firstTry} su ${game.seq.length} al primo colpo`, 'done');
+      setTimeout(newRound, 1100);
+    }
+
+    function updateStats() {
+      const s = game.stats;
+      const presses = s.correct + s.wrong;
+      $('#s-correct').textContent = s.correct;
+      $('#s-wrong').textContent = s.wrong;
+      $('#s-acc').textContent = presses ? Math.round(s.correct / presses * 100) + '%' : '—';
+      $('#s-streak').textContent = s.streak;
+      $('#s-best').textContent = settings.best;
+      $('#s-time').textContent = s.timedNotes ? (s.totalTime / s.timedNotes / 1000).toFixed(1) + ' s' : '—';
+    }
+
+    function resetStats() {
+      game.stats = { correct: 0, wrong: 0, streak: 0, totalTime: 0, timedNotes: 0 };
+      settings.best = 0;
+      saveSettings();
+      updateStats();
+    }
+
+    // ---------- Impostazioni ----------
+
+    function syncControls() {
+      document.querySelectorAll('.seg[data-setting]').forEach(seg => {
+        const value = String(settings[seg.dataset.setting]);
+        seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === value)));
+      });
+      $('#opt-accidentals').checked = settings.accidentals;
+      $('#opt-names').checked = settings.showNames;
+      $('#opt-sound').checked = settings.sound;
+    }
+
+    document.querySelectorAll('.seg[data-setting]').forEach(seg => {
+      seg.addEventListener('click', e => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        const key = seg.dataset.setting;
+        settings[key] = key === 'ledger' ? Number(b.dataset.value) : b.dataset.value;
+        saveSettings();
+        syncControls();
+        if (key === 'naming') {
+          updateKeyLabels();
+        } else {
+          newRound();
+        }
+      });
+    });
+
+    $('#opt-accidentals').addEventListener('change', e => {
+      settings.accidentals = e.target.checked;
+      saveSettings();
+      newRound();
+    });
+    $('#opt-names').addEventListener('change', e => {
+      settings.showNames = e.target.checked;
+      saveSettings();
+      updateKeyLabels();
+    });
+    $('#opt-sound').addEventListener('change', e => {
+      settings.sound = e.target.checked;
+      saveSettings();
+    });
+    $('#btn-new').addEventListener('click', newRound);
+    $('#btn-reset').addEventListener('click', resetStats);
+
+    document.addEventListener('keydown', e => {
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.target.closest?.('input, select, textarea')) return;
+      const pc = KBD_TO_PC[e.code];
+      if (pc === undefined) return;
+      e.preventDefault();
+      press(pc);
+    });
+
+    let resizeTimer;
+    let lastWidth = 0;
+    new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (staffWidth() === lastWidth) return;
+        lastWidth = staffWidth();
+        cursorEl.classList.add('instant');
+        render();
+        requestAnimationFrame(() => cursorEl.classList.remove('instant'));
+      }, 80);
+    }).observe(staffCard);
+
+    syncControls();
+    buildPiano();
+    updateStats();
+    lastWidth = staffWidth();
+    newRound();
+  </script>
+</body>
+</html>
