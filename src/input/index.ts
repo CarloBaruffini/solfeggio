@@ -5,3 +5,4 @@ export {
   createComputerKeyboardSource,
 } from './computerKeyboard';
 export type { ComputerKeyMapping, ComputerKeyboardOptions } from './computerKeyboard';
+export * from './microphone';

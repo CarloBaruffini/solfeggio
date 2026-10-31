@@ -141,3 +141,12 @@ export function parsePitch(text: string): Pitch {
 export function frequencyOfMidi(midi: number): number {
   return 440 * 2 ** ((midi - 69) / 12);
 }
+
+/**
+ * MIDI note number of a frequency in hertz (A4 = 440 Hz), the inverse of
+ * {@link frequencyOfMidi}. The result is fractional: round it for the nearest semitone;
+ * the fractional part is the deviation in hundredths of a semitone (cents / 100).
+ */
+export function midiOfFrequency(frequency: number): number {
+  return 69 + 12 * Math.log2(frequency / 440);
+}

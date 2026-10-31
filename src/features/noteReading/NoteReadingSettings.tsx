@@ -71,6 +71,13 @@ export function NoteReadingSettings({ settings, onChange }: NoteReadingSettingsP
             onChange({ sound });
           }}
         />
+        <Toggle
+          label={t.settings.microphone}
+          checked={settings.microphone}
+          onChange={(microphone) => {
+            onChange({ microphone });
+          }}
+        />
       </div>
     </section>
   );

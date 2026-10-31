@@ -40,7 +40,8 @@ Also run `pnpm test:e2e` when UI behaviour changes.
   Exercise logic must not know which device produced a note.
 - Exercise state lives in a pure reducer in `core/exercises/<exercise>/session.ts`; the feature
   hook owns the side effects (timers, audio, random generation).
-- Persisted state uses Zustand `persist` with a `version`; add a `migrate` when the shape changes.
+- Persisted state uses Zustand `persist` with a `version`; bump it and add a `migrate` when a field
+  is renamed, removed or changes type. New fields with a default need neither (`sanitize` + `merge`).
 - Cross-module imports use `@/…` through the module's `index.ts`; relative imports only inside a module.
 - No hard-coded UI text in components: add it to `src/i18n/it.ts`.
 - Styling: a CSS Module next to each component; colours and radii come from the tokens in
@@ -53,6 +54,8 @@ Also run `pnpm test:e2e` when UI behaviour changes.
 - Components: Testing Library, testing behaviour (roles, labels), not markup details.
 - End-to-end tests live in `e2e/`. The staff exposes the expected answer as
   `data-current-pitch-class` on `[data-testid="staff"]` so tests can play the right key.
+- Audio analysis is tested with synthetic signals (`src/test/signals.ts`) in unit tests, and with
+  Chromium's fake microphone in the `microphone` Playwright project (`e2e/fakeMicrophone.ts`).
 
 ## Documentation rules (mandatory, same commit as the change)
 
@@ -79,6 +82,11 @@ Also run `pnpm test:e2e` when UI behaviour changes.
   resolves, otherwise metrics are wrong.
 - VexFlow sets the width of the element it renders into: measure the parent, never the target.
 - Browsers block audio until a user gesture; `AudioEngine` resumes its context on the first note.
+  Open the microphone from the gesture's handler too (`useMicrophoneInput().start`).
+- The app must stay silent while the microphone listens, or it hears itself and answers twice.
+- Microphone analysis runs on `requestAnimationFrame`: it pauses in background tabs and crawls
+  (1–2 fps) in throttled previews such as the Claude browser pane, which also blocks the real
+  microphone there. Check detection with unit tests and the fake-microphone e2e project.
 - The app is served under `/solfeggio/` (Vite `base`) with hash routing: reference public assets
   through `import.meta.env.BASE_URL`, and use `#/…` links.
 - TypeScript is pinned to 6.0.x until typescript-eslint supports 7 (see ADR 0002).

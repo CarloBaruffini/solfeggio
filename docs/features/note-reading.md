@@ -1,7 +1,8 @@
 # Note reading ("Lettura delle note")
 
 The user sees a short row of random notes on a staff and plays them, left to right,
-on a 12-key piano (on screen or with the computer keyboard).
+on a 12-key piano (on screen or with the computer keyboard) or on a real instrument through
+the microphone ([microphone-input.md](microphone-input.md)).
 
 Code: `src/core/exercises/noteReading/` (rules), `src/features/noteReading/` (screen).
 
@@ -15,6 +16,7 @@ Code: `src/core/exercises/noteReading/` (rules), `src/features/noteReading/` (sc
 | `naming`       | Nomi              | `solfege` (Do Re Mi), `letter` (C D E)                 | `solfege` | No                  |
 | `showKeyNames` | Nomi sui tasti    | on / off                                               | on        | No                  |
 | `sound`        | Suono             | on / off                                               | on        | No                  |
+| `microphone`   | Microfono         | on / off                                               | off       | No                  |
 
 Settings are persisted in `localStorage` (`solfeggio:settings`).
 
@@ -60,7 +62,8 @@ The first round, generated before the staff is laid out, uses the viewport width
 - **Round complete:** the feedback shows "Fatto! X su N al primo colpo"; input is ignored for
   1.1 s, then a new round starts.
 - Every key press plays the key's pitch class **in the octave of the current note**, so the
-  right answer sounds as written. With no current note, octave 4 is used.
+  right answer sounds as written. With no current note, octave 4 is used. The app plays no
+  sound while the microphone setting is on (the microphone would hear it).
 
 ## Statistics
 

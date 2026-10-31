@@ -27,3 +27,8 @@ The UI is in Italian; code and docs use the English terms below.
 | Metronomo                                   | Metronome                        | —                                                      |
 | Spartito                                    | Score / sheet music              | —                                                      |
 | Lettura a prima vista                       | Sight-reading                    | —                                                      |
+| Microfono                                   | Microphone                       | `'microphone'`, `MicrophoneCapture`                    |
+| Riconoscimento dell'altezza (intonazione)   | Pitch detection                  | `createPitchAnalyzer`                                  |
+| Attacco (della nota)                        | Onset / attack                   | `ONSET_RATIO`, `createNoteTracker`                     |
+| Livello (volume)                            | Level, RMS loudness              | `rms`, `levelOfRms`                                    |
+| Strumento traspositore                      | Transposing instrument           | — (not supported yet)                                  |

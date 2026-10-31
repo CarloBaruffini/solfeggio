@@ -12,11 +12,14 @@ src/
     music/        Pitch, pitch classes, MIDI, clefs and staff ranges, note naming (solfège / letters)
     exercises/    One folder per exercise type (generator, session reducer, statistics)
     random.ts     Injectable random source (seedable in tests)
-  audio/        Web Audio: AudioEngine (one shared AudioContext) and the synthesized piano voice
+  audio/        Web Audio: AudioEngine (one shared AudioContext), the synthesized piano voice and
+                the microphone capture
   input/        Note input devices. Each implements NoteInputSource and emits NoteInputEvent
+    microphone/   Pitch detection (pitchy) and the note tracker that turns frames into notes
   notation/     VexFlow adapter and the <StaffView> component. The only place that imports vexflow
   components/   Presentational UI: Piano, SegmentedControl, Toggle, StatCard
   features/     Screens and their hooks; wire core + input + audio + notation + stores together
+    microphone/   useMicrophoneInput hook and status panel, reusable by any exercise
     noteReading/  The note-reading exercise page
     settings/     Persisted user settings (Zustand store)
   i18n/         UI strings (Italian), kept out of components
@@ -67,18 +70,47 @@ Key points:
   actions; the hook owns side effects (timers, randomness, audio).
 - **Inputs are interchangeable.** The game only sees MIDI numbers. Today answers are compared by
   pitch class because the on-screen piano has 12 keys.
+- **Inputs stay independent of audio.** The microphone source reads from a structural
+  `SampleReader`; the feature hook hands it the capture opened by `AudioEngine`.
 - **Notation is data-driven.** `<StaffView>` receives a clef, a list of `{ pitch, state }` and
   the index of the current note; it re-renders the SVG when they change.
 
+## Microphone input
+
+```mermaid
+sequenceDiagram
+  participant Mic as MicrophoneCapture (audio)
+  participant Source as microphone source (input)
+  participant Tracker as pitch analyzer + note tracker (input)
+  participant Hook as useMicrophoneInput (features)
+  participant Session as useNoteReadingSession (features)
+
+  Hook->>Mic: audioEngine.openMicrophone() on a user gesture
+  loop every animation frame
+    Source->>Mic: readFrame(2048 samples)
+    Source->>Tracker: frequency, clarity, RMS, time
+    Source-->>Hook: onFrame { midi, level } (status panel)
+    Tracker-->>Source: MIDI note when a new note starts
+    Source->>Hook: NoteInputEvent { midi, source: 'microphone', time }
+    Hook->>Session: play(event)
+  end
+```
+
+Details and thresholds: [features/microphone-input.md](features/microphone-input.md),
+[decisions/0006](decisions/0006-microphone-pitch-detection.md).
+
 ## State
 
-| State                                                                 | Where                                            | Persisted                               |
-| --------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------- |
-| Settings (clef, ledger lines, accidentals, naming, key labels, sound) | `features/settings/settingsStore.ts` (Zustand)   | `localStorage` key `solfeggio:settings` |
-| Records (best streak)                                                 | `features/noteReading/recordsStore.ts` (Zustand) | `localStorage` key `solfeggio:records`  |
-| Current round, statistics of the session                              | `useReducer` in `useNoteReadingSession`          | No                                      |
+| State                                                                             | Where                                            | Persisted                               |
+| --------------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------- |
+| Settings (clef, ledger lines, accidentals, naming, key labels, sound, microphone) | `features/settings/settingsStore.ts` (Zustand)   | `localStorage` key `solfeggio:settings` |
+| Records (best streak)                                                             | `features/noteReading/recordsStore.ts` (Zustand) | `localStorage` key `solfeggio:records`  |
+| Current round, statistics of the session                                          | `useReducer` in `useNoteReadingSession`          | No                                      |
+| Open microphone, what it hears                                                    | `useMicrophoneInput`                             | No                                      |
 
-Persisted stores declare a `version`; bump it and add a `migrate` function whenever the shape changes.
+Persisted stores declare a `version`; bump it and add a `migrate` function when a field is
+renamed, removed or changes type. A new field with a default needs neither: the sanitizing
+`merge` fills it in.
 
 ## Offline and deployment
 

@@ -17,6 +17,7 @@ export const it = {
     accidentals: 'Alterazioni ♯ ♭',
     showKeyNames: 'Nomi sui tasti',
     sound: 'Suono',
+    microphone: 'Microfono',
   },
   staff: {
     label: (clef: Clef, position: number, total: number) =>
@@ -33,6 +34,25 @@ export const it = {
   },
   piano: {
     label: 'Tastiera',
+  },
+  microphone: {
+    label: 'Microfono',
+    listening: '🎤 In ascolto',
+    level: 'Livello del microfono',
+    heard: 'Sento:',
+    nothing: '—',
+    soundMuted: 'Il suono dell’app è disattivato mentre il microfono ascolta.',
+    activate: 'Attiva il microfono',
+    retry: 'Riprova',
+    status: {
+      needsGesture: 'Il microfono è acceso nelle impostazioni.',
+      starting: 'Avvio del microfono…',
+      denied:
+        'Permesso negato: consenti l’uso del microfono nelle impostazioni del browser per questo sito.',
+      unavailable: 'Nessun microfono disponibile, oppure è già in uso da un’altra app.',
+      unsupported: 'Questo browser non permette di usare il microfono.',
+      failed: 'Non è stato possibile avviare il microfono.',
+    },
   },
   stats: {
     label: 'Statistiche',
