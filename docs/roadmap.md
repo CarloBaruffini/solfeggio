@@ -10,7 +10,7 @@ Status: ✅ done · 🚧 in progress · 📋 planned · 💡 idea
 | --- | ---------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
 | 0   | Single-file prototype                                                        | ✅     | Kept in git history (`legacy/note-reading.html` until the port was complete)    |
 | 1   | Foundation: React + TS + Vite, tooling, CI/CD, docs                          | ✅     | ADRs 0001–0005                                                                  |
-| 2   | Port the note-reading exercise with feature parity, PWA                      | 🚧     | [features/note-reading.md](features/note-reading.md)                            |
+| 2   | Port the note-reading exercise with feature parity, PWA                      | ✅     | [features/note-reading.md](features/note-reading.md)                            |
 | 3   | MIDI keyboard input (Web MIDI API)                                           | 📋     | New `NoteInputSource`. Not supported by Safari / iOS                            |
 | 4   | Extended keyboard: 61 or 88 keys, scroll/zoom on mobile, "exact octave" mode | 📋     | `Pitch` already carries the octave                                              |
 | 5   | Grand staff (treble + bass together)                                         | 📋     | Needs a two-stave layout in `notation/`                                         |

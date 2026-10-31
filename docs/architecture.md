@@ -84,5 +84,6 @@ Persisted stores declare a `version`; bump it and add a `migrate` function whene
 
 `vite-plugin-pwa` generates the manifest and a Workbox service worker that precaches the whole
 build, including the Bravura music font (embedded in VexFlow's `vexflow/bravura` entry) and the
-self-hosted UI fonts. CI deploys to GitHub Pages under `/solfeggio/` with hash routing
+self-hosted UI fonts. The notation module (VexFlow and its font, about 1 MB) is lazy-loaded
+with `React.lazy`, so the page renders while it downloads. CI deploys to GitHub Pages under `/solfeggio/` with hash routing
 (see [0005](decisions/0005-github-pages-hosting.md)).

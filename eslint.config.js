@@ -18,7 +18,7 @@ const layerRestriction = (forbidden, message) => ({
 });
 
 export default defineConfig([
-  globalIgnores(['dist', 'dev-dist', 'coverage', 'playwright-report', 'test-results', 'legacy']),
+  globalIgnores(['dist', 'dev-dist', 'coverage', 'playwright-report', 'test-results']),
 
   {
     files: ['**/*.{ts,tsx}'],

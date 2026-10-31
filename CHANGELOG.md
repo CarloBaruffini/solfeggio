@@ -9,6 +9,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Rewrote the app in React + TypeScript with the same features as the prototype.
 - The music font and UI fonts are bundled with the app: no external CDN is needed.
+- Average response time uses the Italian decimal comma (e.g. 2,4 s).
 
 ### Added
 

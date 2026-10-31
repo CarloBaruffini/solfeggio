@@ -48,6 +48,7 @@ written note maps to exactly one key with its usual name.
 The same note (same position and accidental) never appears twice in a row.
 
 Notes per round depend on the staff width: 8 from 640 px, 6 from 440 px, otherwise 5.
+The first round, generated before the staff is laid out, uses the viewport width instead.
 
 ## Answering
 
@@ -63,14 +64,14 @@ Notes per round depend on the staff width: 8 from 640 px, 6 from 440 px, otherwi
 
 ## Statistics
 
-| Stat         | UI label     | Definition                                                                           |
-| ------------ | ------------ | ------------------------------------------------------------------------------------ |
-| Correct      | Corrette     | Number of correct key presses                                                        |
-| Wrong        | Errori       | Number of wrong key presses                                                          |
-| Accuracy     | Precisione   | correct ÷ (correct + wrong), rounded to an integer %; "—" before the first press     |
-| Streak       | Serie        | Consecutive notes answered right at the first attempt; a wrong press resets it       |
-| Best streak  | Record serie | Highest streak ever; persisted (`solfeggio:records`)                                 |
-| Average time | Tempo medio  | Mean time from a note becoming current to its correct answer, in seconds (1 decimal) |
+| Stat         | UI label     | Definition                                                                                                               |
+| ------------ | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Correct      | Corrette     | Number of correct key presses                                                                                            |
+| Wrong        | Errori       | Number of wrong key presses                                                                                              |
+| Accuracy     | Precisione   | correct ÷ (correct + wrong), rounded to an integer %; "—" before the first press                                         |
+| Streak       | Serie        | Consecutive notes answered right at the first attempt; a wrong press resets it                                           |
+| Best streak  | Record serie | Highest streak ever; persisted (`solfeggio:records`)                                                                     |
+| Average time | Tempo medio  | Mean time from a note becoming current to its correct answer, in seconds with one decimal, Italian format (e.g. `2,4 s`) |
 
 "Nuove note" starts a new round; "Azzera statistiche" resets the statistics and the best streak.
 
