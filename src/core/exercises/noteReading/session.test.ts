@@ -52,7 +52,12 @@ describe('sessionReducer', () => {
     const state = run(createSession(pitches, 0), answer(A4));
     expect(state.currentIndex).toBe(0);
     expect(state.stats).toMatchObject({ wrong: 1, streak: 0 });
-    expect(state.lastEvent).toEqual({ kind: 'wrong', expected: pitches[0], played: 9, hint: false });
+    expect(state.lastEvent).toEqual({
+      kind: 'wrong',
+      expected: pitches[0],
+      played: 9,
+      hint: false,
+    });
 
     const answered = run(state, answer(G4));
     expect(noteDisplayStates(answered)).toEqual(['missed', 'current', 'pending']);
