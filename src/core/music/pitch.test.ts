@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   diatonicIndex,
   formatPitch,
+  frequencyOfMidi,
   isBlackKey,
   midiInOctave,
   midiNumber,
@@ -89,5 +90,13 @@ describe('piano keys', () => {
     expect(midiInOctave(0, 4)).toBe(60);
     expect(midiInOctave(9, 4)).toBe(69);
     expect(midiInOctave(11, 2)).toBe(47);
+  });
+});
+
+describe('frequencyOfMidi', () => {
+  it('tunes A4 to 440 Hz and doubles every octave', () => {
+    expect(frequencyOfMidi(69)).toBe(440);
+    expect(frequencyOfMidi(81)).toBe(880);
+    expect(frequencyOfMidi(60)).toBeCloseTo(261.63, 2);
   });
 });

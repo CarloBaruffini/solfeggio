@@ -136,3 +136,8 @@ export function parsePitch(text: string): Pitch {
     octave: Number(octave),
   };
 }
+
+/** Frequency in hertz of a MIDI note in twelve-tone equal temperament (A4 = 440 Hz). */
+export function frequencyOfMidi(midi: number): number {
+  return 440 * 2 ** ((midi - 69) / 12);
+}
