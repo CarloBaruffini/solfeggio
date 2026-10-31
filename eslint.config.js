@@ -11,6 +11,8 @@ import tseslint from 'typescript-eslint';
  *   core  <-  audio / input / notation  <-  components / features  <-  app
  * A module may only import from layers to its left.
  */
+const modules = (...names) => names.flatMap((name) => [`@/${name}`, `@/${name}/**`]);
+
 const layerRestriction = (forbidden, message) => ({
   'no-restricted-imports': ['error', { patterns: [{ group: forbidden, message }] }],
 });
@@ -45,14 +47,13 @@ export default defineConfig([
     rules: layerRestriction(
       [
         'react',
+        'react/**',
         'react-*',
-        'react/*',
         'vexflow',
-        'vexflow/*',
+        'vexflow/**',
         'zustand',
-        'zustand/*',
-        '@/*',
-        '!@/core/*',
+        'zustand/**',
+        ...modules('audio', 'input', 'notation', 'components', 'features', 'app', 'i18n', 'styles'),
       ],
       'core/ is framework-agnostic: it may only import from core/.',
     ),
@@ -60,20 +61,20 @@ export default defineConfig([
   {
     files: ['src/audio/**', 'src/input/**', 'src/notation/**'],
     rules: layerRestriction(
-      ['@/components/*', '@/features/*', '@/app/*', 'zustand', 'zustand/*'],
+      [...modules('components', 'features', 'app'), 'zustand', 'zustand/**'],
       'audio/, input/ and notation/ may only import from core/ (and their own layer).',
     ),
   },
   {
     files: ['src/components/**'],
     rules: layerRestriction(
-      ['@/features/*', '@/app/*', 'zustand', 'zustand/*'],
+      [...modules('features', 'app'), 'zustand', 'zustand/**'],
       'components/ are presentational: they must not depend on features/, app/ or stores.',
     ),
   },
   {
     files: ['src/features/**'],
-    rules: layerRestriction(['@/app/*'], 'features/ must not depend on app/.'),
+    rules: layerRestriction(modules('app'), 'features/ must not depend on app/.'),
   },
 
   {
